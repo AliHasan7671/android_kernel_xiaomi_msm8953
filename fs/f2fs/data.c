@@ -1652,50 +1652,6 @@ static int f2fs_mpage_readpages(struct address_space *mapping,
 			zero_user_segment(page, 0, PAGE_SIZE);
 			unlock_page(page);
 		}
-
-		/*
-		 * This page will go to BIO.  Do we need to send this
-		 * BIO off first?
-		 */
-		if (bio && (last_block_in_bio != block_nr - 1 ||
-			!__same_bdev(F2FS_I_SB(inode), block_nr, bio))) {
-submit_and_realloc:
-			__f2fs_submit_read_bio(F2FS_I_SB(inode), bio, DATA);
-			bio = NULL;
-		}
-		if (bio == NULL) {
-			bio = f2fs_grab_read_bio(inode, block_nr, nr_pages,
-					is_readahead ? REQ_RAHEAD : 0);
-			if (IS_ERR(bio)) {
-				bio = NULL;
-				goto set_error_page;
-			}
-		}
-
-		/*
-		 * If the page is under writeback, we need to wait for
-		 * its completion to see the correct decrypted data.
-		 */
-		f2fs_wait_on_block_writeback(inode, block_nr);
-
-		if (bio_add_page(bio, page, blocksize, 0) < blocksize)
-			goto submit_and_realloc;
-
-		inc_page_count(F2FS_I_SB(inode), F2FS_RD_DATA);
-		ClearPageError(page);
-		last_block_in_bio = block_nr;
-		goto next_page;
-set_error_page:
-		SetPageError(page);
-		zero_user_segment(page, 0, PAGE_SIZE);
-		unlock_page(page);
-		goto next_page;
-confused:
-		if (bio) {
-			__f2fs_submit_read_bio(F2FS_I_SB(inode), bio, DATA);
-			bio = NULL;
-		}
-		unlock_page(page);
 next_page:
 		if (pages)
 			put_page(page);
