@@ -38,7 +38,8 @@
 #include <asm/vdso_datapage.h>
 
 extern char vdso_start[], vdso_end[];
-static unsigned long vdso_pages __ro_after_init;
+static unsigned long vdso_pages;
+static struct page **vdso_pagelist;
 
 /*
  * The vDSO data page.
