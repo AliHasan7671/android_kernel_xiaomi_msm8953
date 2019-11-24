@@ -3904,15 +3904,14 @@ typedef struct
    uint32_t                    btc_dyn_num_bt_ext;
    bool                        indoor_channel_support;
    bool                        force_rsne_override;
-   char enabledefaultSAP[CFG_CONCURRENT_IFACE_MAX_LEN];
 #ifdef WLAN_FEATURE_SAE
    bool                        is_sae_enabled;
 #endif
 } hdd_config_t;
 
-/*--------------------------------------------------------------------------- 
+/*---------------------------------------------------------------------------
   Function declarations and documenation
-  -------------------------------------------------------------------------*/ 
+  -------------------------------------------------------------------------*/
 VOS_STATUS hdd_parse_config_ini(hdd_context_t *pHddCtx);
 VOS_STATUS hdd_set_sme_config( hdd_context_t *pHddCtx );
 v_BOOL_t hdd_update_config_dat ( hdd_context_t *pHddCtx );
